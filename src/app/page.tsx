@@ -2,7 +2,7 @@ export default async function Home() {
   let location = "Amsterdam";
   let getWeather = async () => {
     const response = await fetch(
-      "http://api.weatherapi.com/v1/current.json?key= 33b24dfe14c74f1eae1133155242906 &q=Amsterdam&aqi=no"
+      `http://api.weatherapi.com/v1/current.json?key= ${process.env.API_KEY} &q=Amsterdam&aqi=no`
     );
     const data = await response.json();
     return data;
