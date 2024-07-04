@@ -2,7 +2,7 @@ export default async function Home() {
   let location = "Amsterdam";
   let getWeather = async () => {
     const response = await fetch(
-      `http://api.weatherapi.com/v1/current.json?key= ${process.env.API_KEY} &q=Amsterdam&aqi=no`
+      `http://api.weatherapi.com/v1/current.json?key= ${process.env.API_KEY} &q=${location}&aqi=no`
     );
     const data = await response.json();
     return data;
@@ -17,6 +17,13 @@ export default async function Home() {
       return "Lange broek en trui";
     }
   };
+
+  function changeLocation() {
+    let newLocation = document.getElementById("locationInput")!.value;
+    if (newLocation === "") return;
+    location = newLocation;
+    getWeather();
+  }
 
   return (
     <main className="">
@@ -52,6 +59,19 @@ export default async function Home() {
             <br />
             <span className="font-normal">{getClothes()}</span>
           </p>
+          <div id="locationChooser">
+            <input
+              type="text"
+              id="locationInput"
+              className="border-2 border-black dark:border-white p-2 mt-4"
+            />
+            <button
+              onClick={changeLocation}
+              className="bg-black dark:bg-white text-white dark:text-black p-2 mt-4"
+            >
+              Verander locatie
+            </button>
+          </div>
         </div>
       </section>
     </main>
