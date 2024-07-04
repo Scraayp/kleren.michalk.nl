@@ -18,12 +18,12 @@ export default async function Home() {
     }
   };
 
-  function changeLocation() {
-    let newLocation = document.getElementById("locationInput")!.value;
-    if (newLocation === "") return;
-    location = newLocation;
-    getWeather();
-  }
+  // function changeLocation() {
+  //   let newLocation = document.getElementById("locationInput")!.value;
+  //   if (newLocation === "") return;
+  //   location = newLocation;
+  //   getWeather();
+  // }
 
   return (
     <main className="">
@@ -59,7 +59,7 @@ export default async function Home() {
             <br />
             <span className="font-normal">{getClothes()}</span>
           </p>
-          <div id="locationChooser">
+          {/* <div id="locationChooser">
             <input
               type="text"
               id="locationInput"
@@ -71,7 +71,7 @@ export default async function Home() {
             >
               Verander locatie
             </button>
-          </div>
+          </div> */}
         </div>
       </section>
     </main>
