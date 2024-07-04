@@ -72,6 +72,7 @@ export default async function Home() {
               Verander locatie
             </button>
           </div> */}
+          {/* 1 */}
         </div>
       </section>
     </main>
