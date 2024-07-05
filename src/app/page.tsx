@@ -18,13 +18,6 @@ export default async function Home() {
     }
   };
 
-  // function changeLocation() {
-  //   let newLocation = document.getElementById("locationInput")!.value;
-  //   if (newLocation === "") return;
-  //   location = newLocation;
-  //   getWeather();
-  // }
-
   return (
     <main className="">
       <section className="">
@@ -59,20 +52,6 @@ export default async function Home() {
             <br />
             <span className="font-normal">{getClothes()}</span>
           </p>
-          {/* <div id="locationChooser">
-            <input
-              type="text"
-              id="locationInput"
-              className="border-2 border-black dark:border-white p-2 mt-4"
-            />
-            <button
-              onClick={changeLocation}
-              className="bg-black dark:bg-white text-white dark:text-black p-2 mt-4"
-            >
-              Verander locatie
-            </button>
-          </div> */}
-          {/* 12 */}
         </div>
       </section>
     </main>
