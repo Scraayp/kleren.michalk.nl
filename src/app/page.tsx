@@ -1,15 +1,40 @@
 "use client";
-
 import { useEffect, useState } from "react";
 
+type Weather = {
+  lat: string;
+  lon: string;
+  elevation: number;
+  timezone: string;
+  units: string;
+  current: {
+    icon: string;
+    icon_num: number;
+    summary: string;
+    temperature: number;
+    wind: {
+      speed: number;
+      angle: number;
+      dir: string;
+    };
+    precipitation: {
+      total: number;
+      type: string;
+    };
+    cloud_cover: number;
+  };
+  hourly: null | any;
+  daily: null | any;
+};
+
 export default function Home() {
-  const [weather, setWeather] = useState(null);
+  const [weather, setWeather] = useState<Weather | null>(null);
   const [error, setError] = useState(null);
   const location = "Amsterdam"; // Set your location name here
 
   const getWeather = async () => {
     const place_id = "amsterdam"; // Replace with your place_id or lat/lon
-    const apiKey = process.env.API_KEY; // Replace with your API key
+    const apiKey = "t0jfawpj2p8oy1qie7wutvb6ht9me0mz1pkvxr6w"; // Replace with your API key
     const sections = "current"; // Define the sections you need
     const timezone = "UTC"; // Adjust the timezone if needed
     const units = "metric"; // "metric" or "imperial"
