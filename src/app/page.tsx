@@ -61,10 +61,16 @@ export default function Home() {
   const getClothes = () => {
     if (!weather || !weather.current) return "Loading...";
     const temp = weather.current.temperature;
-    if (temp > 20) {
+    if (temp > 28) {
+      return "Naakt is prima, maar korte broek en t-shirt is ook goed";
+    } else if (temp > 20) {
       return "Korte broek en t-shirt";
-    } else {
+    } else if (temp > 17) {
+      return "Lange broek en t-shirt";
+    } else if (temp > 14) {
       return "Lange broek en trui";
+    } else {
+      return "Lange broek en jas";
     }
   };
 
