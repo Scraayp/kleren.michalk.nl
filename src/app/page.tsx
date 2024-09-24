@@ -9,7 +9,7 @@ export default function Home() {
 
   const getWeather = async () => {
     const place_id = "amsterdam"; // Replace with your place_id or lat/lon
-    const apiKey = "kgsxtn3fdqxwatoif1icf1ay2drsi0cofqzi6aw4"; // Replace with your API key
+    const apiKey = process.env.API_KEY; // Replace with your API key
     const sections = "current"; // Define the sections you need
     const timezone = "UTC"; // Adjust the timezone if needed
     const units = "metric"; // "metric" or "imperial"
