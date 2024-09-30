@@ -1,5 +1,15 @@
 "use client";
+
 import { useEffect, useState } from "react";
+import {
+  Sun,
+  Cloud,
+  CloudRain,
+  CloudSnow,
+  Wind,
+  Droplet,
+  Thermometer,
+} from "lucide-react";
 
 type Weather = {
   lat: string;
@@ -27,17 +37,24 @@ type Weather = {
   daily: null | any;
 };
 
-export default function Home() {
+const weatherIcons: { [key: string]: any } = {
+  sunny: Sun,
+  cloudy: Cloud,
+  rainy: CloudRain,
+  snowy: CloudSnow,
+};
+
+export default function WeatherApp() {
   const [weather, setWeather] = useState<Weather | null>(null);
-  const [error, setError] = useState(null);
-  const location = "Amsterdam"; // Set your location name here
+  const [error, setError] = useState<string | null>(null);
+  const location = "Amsterdam";
 
   const getWeather = async () => {
-    const place_id = "amsterdam"; // Replace with your place_id or lat/lon
-    const apiKey = "t0jfawpj2p8oy1qie7wutvb6ht9me0mz1pkvxr6w"; // Replace with your API key
-    const sections = "current"; // Define the sections you need
-    const timezone = "UTC"; // Adjust the timezone if needed
-    const units = "metric"; // "metric" or "imperial"
+    const place_id = "amsterdam";
+    const apiKey = "t0jfawpj2p8oy1qie7wutvb6ht9me0mz1pkvxr6w";
+    const sections = "current";
+    const timezone = "UTC";
+    const units = "metric";
 
     try {
       const response = await fetch(
@@ -74,51 +91,98 @@ export default function Home() {
     }
   };
 
+  const getWeatherIcon = () => {
+    if (!weather || !weather.current) return Sun;
+    const summary = weather.current.summary.toLowerCase();
+    if (summary.includes("rain")) return CloudRain;
+    if (summary.includes("snow")) return CloudSnow;
+    if (summary.includes("cloud")) return Cloud;
+    return Sun;
+  };
+
+  const getBackgroundClass = () => {
+    if (!weather || !weather.current) return "from-blue-400 to-blue-200";
+    const summary = weather.current.summary.toLowerCase();
+    if (summary.includes("rain")) return "from-gray-400 to-blue-300";
+    if (summary.includes("snow")) return "from-gray-100 to-blue-100";
+    if (summary.includes("cloud")) return "from-gray-300 to-blue-200";
+    return "from-yellow-200 to-blue-400";
+  };
+
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="text-center text-red-500 text-xl p-4">Error: {error}</div>
+    );
   }
 
   if (!weather) {
-    return <div>Loading...</div>;
+    return (
+      <div className="text-center text-gray-500 text-xl p-4">Loading...</div>
+    );
   }
 
-  return (
-    <main className="">
-      <section className="">
-        <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
-          <h1 className="text-4xl font-extrabold tracking-tight leading-none md:text-5xl lg:text-6xl text-black dark:text-white">
-            Welke kleren zou ik aandoen?
-          </h1>
-          <h2 className="text-center dark:text-white text-2xl">
-            Gebaseerd op: {location}
-          </h2>
-        </div>
-        <div>
-          <p className="text-black dark:text-white text-xl font-bold text-center">
-            Temperatuur op dit moment:{" "}
-            <span className="font-normal">
-              {weather.current.temperature} °C
-            </span>
-          </p>
-          <p className="text-black dark:text-white text-xl font-bold text-center">
-            Kans op regen:{" "}
-            <span className="font-normal">
-              {weather.current.precipitation.total} % (
-              {weather.current.precipitation.type})
-            </span>
-          </p>
-          <p className="text-black dark:text-white text-xl font-bold text-center">
-            Weersomstandigheden:{" "}
-            <span className="font-normal">{weather.current.summary}</span>
-          </p>
+  const WeatherIcon = getWeatherIcon();
 
-          <p className="text-black dark:text-white text-xl font-bold text-center mt-20">
-            Kleren:
-            <br />
-            <span className="font-normal">{getClothes()}</span>
-          </p>
+  return (
+    <main
+      className={`min-h-screen flex items-center justify-center bg-gradient-to-br ${getBackgroundClass()} transition-all duration-1000`}
+    >
+      <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-8 max-w-2xl w-full mx-4">
+        <h1 className="text-4xl font-extrabold tracking-tight leading-none md:text-5xl lg:text-6xl text-white mb-4 text-center">
+          Welke kleren zou ik aandoen?
+        </h1>
+        <h2 className="text-center text-white text-2xl mb-8">
+          Gebaseerd op: {location}
+        </h2>
+
+        <div className="flex justify-center mb-8">
+          <WeatherIcon className="w-32 h-32 text-white" />
         </div>
-      </section>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="flex items-center justify-center">
+            <Thermometer className="w-8 h-8 text-white mr-2" />
+            <p className="text-white text-xl">
+              <span className="font-bold">Temperatuur: </span>
+              {weather.current.temperature} °C
+            </p>
+          </div>
+          <div className="flex items-center justify-center">
+            <Droplet className="w-8 h-8 text-white mr-2" />
+            <p className="text-white text-xl">
+              <span className="font-bold">Kans op regen: </span>
+              {weather.current.precipitation.total}% (
+              {weather.current.precipitation.type})
+            </p>
+          </div>
+          <div className="flex items-center justify-center">
+            <Wind className="w-8 h-8 text-white mr-2" />
+            <p className="text-white text-xl">
+              <span className="font-bold">Wind: </span>
+              {weather.current.wind.speed} m/s ({weather.current.wind.dir})
+            </p>
+          </div>
+          <div className="flex items-center justify-center">
+            <Cloud className="w-8 h-8 text-white mr-2" />
+            <p className="text-white text-xl">
+              <span className="font-bold">Bewolking: </span>
+              {weather.current.cloud_cover}%
+            </p>
+          </div>
+        </div>
+
+        <p className="text-white text-xl font-bold text-center mb-4">
+          Weersomstandigheden:{" "}
+          <span className="font-normal">{weather.current.summary}</span>
+        </p>
+
+        <div className="bg-white bg-opacity-30 rounded-lg p-6 mt-8">
+          <p className="text-white text-2xl font-bold text-center mb-2">
+            Aanbevolen kleding:
+          </p>
+          <p className="text-white text-xl text-center">{getClothes()}</p>
+        </div>
+      </div>
     </main>
   );
 }
