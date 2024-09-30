@@ -9,6 +9,7 @@ import {
   Wind,
   Droplet,
   Thermometer,
+  Umbrella,
 } from "lucide-react";
 
 type Weather = {
@@ -33,8 +34,27 @@ type Weather = {
     };
     cloud_cover: number;
   };
+  daily: {
+    data: [
+      {
+        all_day: {
+          temperature: number;
+          temperature_min: number;
+          temperature_max: number;
+          wind: {
+            speed: number;
+            dir: string;
+            angle: number;
+          };
+          precipitation: {
+            total: number;
+            type: string;
+          };
+        };
+      }
+    ];
+  };
   hourly: null | any;
-  daily: null | any;
 };
 
 const weatherIcons: { [key: string]: any } = {
@@ -52,7 +72,7 @@ export default function WeatherApp() {
   const getWeather = async () => {
     const place_id = "amsterdam";
     const apiKey = "t0jfawpj2p8oy1qie7wutvb6ht9me0mz1pkvxr6w";
-    const sections = "current";
+    const sections = "current,daily";
     const timezone = "UTC";
     const units = "metric";
 
@@ -64,7 +84,6 @@ export default function WeatherApp() {
         throw new Error("Failed to fetch weather data");
       }
       const data = await response.json();
-      console.log(data);
       setWeather(data);
     } catch (err: any) {
       setError(err.message);
@@ -101,23 +120,27 @@ export default function WeatherApp() {
   };
 
   const getBackgroundClass = () => {
-    if (!weather || !weather.current) return "from-blue-400 to-blue-200";
+    if (!weather || !weather.current) return "from-blue-600 to-blue-400";
     const summary = weather.current.summary.toLowerCase();
-    if (summary.includes("rain")) return "from-gray-400 to-blue-300";
-    if (summary.includes("snow")) return "from-gray-100 to-blue-100";
-    if (summary.includes("cloud")) return "from-gray-300 to-blue-200";
-    return "from-yellow-200 to-blue-400";
+    if (summary.includes("rain")) return "from-gray-600 to-blue-500";
+    if (summary.includes("snow")) return "from-gray-300 to-blue-300";
+    if (summary.includes("cloud")) return "from-gray-500 to-blue-400";
+    return "from-yellow-400 to-blue-600";
   };
 
   if (error) {
     return (
-      <div className="text-center text-red-500 text-xl p-4">Error: {error}</div>
+      <div className="text-center text-red-600 text-xl p-4 bg-white">
+        Error: {error}
+      </div>
     );
   }
 
   if (!weather) {
     return (
-      <div className="text-center text-gray-500 text-xl p-4">Loading...</div>
+      <div className="text-center text-gray-800 text-xl p-4 bg-white">
+        Loading...
+      </div>
     );
   }
 
@@ -127,60 +150,104 @@ export default function WeatherApp() {
     <main
       className={`min-h-screen flex items-center justify-center bg-gradient-to-br ${getBackgroundClass()} transition-all duration-1000`}
     >
-      <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-8 max-w-2xl w-full mx-4">
-        <h1 className="text-4xl font-extrabold tracking-tight leading-none md:text-5xl lg:text-6xl text-white mb-4 text-center">
+      <div className="bg-white bg-opacity-90 shadow-lg rounded-xl p-8 max-w-2xl w-full mx-4">
+        <h1 className="text-4xl font-extrabold tracking-tight leading-none md:text-5xl lg:text-6xl text-gray-900 mb-4 text-center">
           Welke kleren zou ik aandoen?
         </h1>
-        <h2 className="text-center text-white text-2xl mb-8">
+        <h2 className="text-center text-gray-800 text-2xl mb-8">
           Gebaseerd op: {location}
         </h2>
 
         <div className="flex justify-center mb-8">
-          <WeatherIcon className="w-32 h-32 text-white" />
+          <WeatherIcon className="w-32 h-32 text-gray-800" />
         </div>
 
+        <h3 className="text-2xl font-bold text-gray-900 mb-4">
+          Huidige weersituatie
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="flex items-center justify-center">
-            <Thermometer className="w-8 h-8 text-white mr-2" />
-            <p className="text-white text-xl">
+          <div className="flex items-center justify-center bg-gray-100 rounded-lg p-4">
+            <Thermometer className="w-8 h-8 text-gray-800 mr-2" />
+            <p className="text-gray-800 text-xl">
               <span className="font-bold">Temperatuur: </span>
               {weather.current.temperature} °C
             </p>
           </div>
-          <div className="flex items-center justify-center">
-            <Droplet className="w-8 h-8 text-white mr-2" />
-            <p className="text-white text-xl">
+          <div className="flex items-center justify-center bg-gray-100 rounded-lg p-4">
+            <Droplet className="w-8 h-8 text-gray-800 mr-2" />
+            <p className="text-gray-800 text-xl">
               <span className="font-bold">Kans op regen: </span>
               {weather.current.precipitation.total}% (
               {weather.current.precipitation.type})
             </p>
           </div>
-          <div className="flex items-center justify-center">
-            <Wind className="w-8 h-8 text-white mr-2" />
-            <p className="text-white text-xl">
+          <div className="flex items-center justify-center bg-gray-100 rounded-lg p-4">
+            <Wind className="w-8 h-8 text-gray-800 mr-2" />
+            <p className="text-gray-800 text-xl">
               <span className="font-bold">Wind: </span>
               {weather.current.wind.speed} m/s ({weather.current.wind.dir})
             </p>
           </div>
-          <div className="flex items-center justify-center">
-            <Cloud className="w-8 h-8 text-white mr-2" />
-            <p className="text-white text-xl">
+          <div className="flex items-center justify-center bg-gray-100 rounded-lg p-4">
+            <Cloud className="w-8 h-8 text-gray-800 mr-2" />
+            <p className="text-gray-800 text-xl">
               <span className="font-bold">Bewolking: </span>
               {weather.current.cloud_cover}%
             </p>
           </div>
         </div>
 
-        <p className="text-white text-xl font-bold text-center mb-4">
+        <h3 className="text-2xl font-bold text-gray-900 mb-4">
+          Dagelijkse voorspelling
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="flex items-center bg-gray-100 rounded-lg p-4">
+            <Thermometer className="w-8 h-8 text-gray-800 mr-2" />
+            <div>
+              <p className="text-gray-800 text-xl">
+                <span className="font-bold">Max: </span>
+                {weather.daily.data[0].all_day.temperature_max} °C
+              </p>
+              <p className="text-gray-800 text-xl">
+                <span className="font-bold">Min: </span>
+                {weather.daily.data[0].all_day.temperature_min} °C
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center bg-gray-100 rounded-lg p-4">
+            <Umbrella className="w-8 h-8 text-gray-800 mr-2" />
+            <p className="text-gray-800 text-xl">
+              <span className="font-bold">Neerslag: </span>
+              {weather.daily.data[0].all_day.precipitation.total} mm
+            </p>
+          </div>
+          <div className="flex items-center bg-gray-100 rounded-lg p-4">
+            <Wind className="w-8 h-8 text-gray-800 mr-2" />
+            <p className="text-gray-800 text-xl">
+              <span className="font-bold">Wind: </span>
+              {weather.daily.data[0].all_day.wind.speed} m/s (
+              {weather.daily.data[0].all_day.wind.dir})
+            </p>
+          </div>
+          <div className="flex items-center bg-gray-100 rounded-lg p-4">
+            <Thermometer className="w-8 h-8 text-gray-800 mr-2" />
+            <p className="text-gray-800 text-xl">
+              <span className="font-bold">Gem. temperatuur: </span>
+              {weather.daily.data[0].all_day.temperature} °C
+            </p>
+          </div>
+        </div>
+
+        <p className="text-gray-800 text-xl font-bold text-center mb-4 bg-gray-100 rounded-lg p-4">
           Weersomstandigheden:{" "}
           <span className="font-normal">{weather.current.summary}</span>
         </p>
 
-        <div className="bg-white bg-opacity-30 rounded-lg p-6 mt-8">
-          <p className="text-white text-2xl font-bold text-center mb-2">
+        <div className="bg-blue-100 rounded-lg p-6 mt-8">
+          <p className="text-gray-900 text-2xl font-bold text-center mb-2">
             Aanbevolen kleding:
           </p>
-          <p className="text-white text-xl text-center">{getClothes()}</p>
+          <p className="text-gray-800 text-xl text-center">{getClothes()}</p>
         </div>
       </div>
     </main>
