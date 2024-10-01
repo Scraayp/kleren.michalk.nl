@@ -221,6 +221,47 @@ export default function WeatherApp() {
           </div>
         </div>
 
+        <h3 className="text-2xl font-bold text-gray-900 mb-4">
+          Dagelijkse voorspelling
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="flex items-center bg-gray-100 rounded-lg p-4">
+            <Thermometer className="w-8 h-8 text-gray-800 mr-2" />
+            <div>
+              <p className="text-gray-800 text-xl">
+                <span className="font-bold">Max: </span>
+                {weather.daily.data[0].all_day.temperature_max} °C
+              </p>
+              <p className="text-gray-800 text-xl">
+                <span className="font-bold">Min: </span>
+                {weather.daily.data[0].all_day.temperature_min} °C
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center bg-gray-100 rounded-lg p-4">
+            <Umbrella className="w-8 h-8 text-gray-800 mr-2" />
+            <p className="text-gray-800 text-xl">
+              <span className="font-bold">Neerslag: </span>
+              {weather.daily.data[0].all_day.precipitation.total} mm
+            </p>
+          </div>
+          <div className="flex items-center bg-gray-100 rounded-lg p-4">
+            <Wind className="w-8 h-8 text-gray-800 mr-2" />
+            <p className="text-gray-800 text-xl">
+              <span className="font-bold">Wind: </span>
+              {weather.daily.data[0].all_day.wind.speed} m/s (
+              {weather.daily.data[0].all_day.wind.dir})
+            </p>
+          </div>
+          <div className="flex items-center bg-gray-100 rounded-lg p-4">
+            <Thermometer className="w-8 h-8 text-gray-800 mr-2" />
+            <p className="text-gray-800 text-xl">
+              <span className="font-bold">Gem. temperatuur: </span>
+              {weather.daily.data[0].all_day.temperature} °C
+            </p>
+          </div>
+        </div>
+
         <p className="text-gray-800 text-xl font-bold text-center mb-4 bg-gray-100 rounded-lg p-4">
           Weersomstandigheden:{" "}
           <span className="font-normal">{weather.current.summary}</span>
