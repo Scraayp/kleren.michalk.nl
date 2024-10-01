@@ -67,10 +67,11 @@ const weatherIcons: { [key: string]: any } = {
 export default function WeatherApp() {
   const [weather, setWeather] = useState<Weather | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const location = "Amsterdam";
+  const [cityName, setCityName] = useState<string>("Amsterdam"); // Default to Amsterdam
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
 
-  const getWeather = async () => {
-    const place_id = "amsterdam";
+  const getWeather = async (lat: number, lon: number) => {
     const apiKey = "t0jfawpj2p8oy1qie7wutvb6ht9me0mz1pkvxr6w";
     const sections = "current,daily";
     const timezone = "UTC";
@@ -78,7 +79,7 @@ export default function WeatherApp() {
 
     try {
       const response = await fetch(
-        `https://www.meteosource.com/api/v1/free/point?place_id=${place_id}&sections=${sections}&timezone=${timezone}&units=${units}&key=${apiKey}`
+        `https://www.meteosource.com/api/v1/free/point?lat=${lat}&lon=${lon}&sections=${sections}&timezone=${timezone}&units=${units}&key=${apiKey}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch weather data");
@@ -90,9 +91,32 @@ export default function WeatherApp() {
     }
   };
 
+  const getUserLocation = async () => {
+    try {
+      // Using ip-api.com to get lat, lon, and city name from IP
+      const response = await fetch("http://ip-api.com/json/");
+      const data = await response.json();
+      setCityName(data.city);
+      setLatitude(data.lat);
+      setLongitude(data.lon);
+    } catch (err) {
+      setError("Failed to fetch location, defaulting to Amsterdam.");
+      // Default to Amsterdam if there's an error
+      setCityName("Amsterdam");
+      setLatitude(52.3676); // Amsterdam latitude
+      setLongitude(4.9041); // Amsterdam longitude
+    }
+  };
+
   useEffect(() => {
-    getWeather();
+    getUserLocation();
   }, []);
+
+  useEffect(() => {
+    if (latitude && longitude) {
+      getWeather(latitude, longitude);
+    }
+  }, [latitude, longitude]);
 
   const getClothes = () => {
     if (!weather || !weather.current) return "Loading...";
@@ -155,7 +179,7 @@ export default function WeatherApp() {
           Welke kleren zou ik aandoen?
         </h1>
         <h2 className="text-center text-gray-800 text-2xl mb-8">
-          Gebaseerd op: {location}
+          Gebaseerd op je huidige locatie: {cityName}
         </h2>
 
         <div className="flex justify-center mb-8">
@@ -193,47 +217,6 @@ export default function WeatherApp() {
             <p className="text-gray-800 text-xl">
               <span className="font-bold">Bewolking: </span>
               {weather.current.cloud_cover}%
-            </p>
-          </div>
-        </div>
-
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">
-          Dagelijkse voorspelling
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="flex items-center bg-gray-100 rounded-lg p-4">
-            <Thermometer className="w-8 h-8 text-gray-800 mr-2" />
-            <div>
-              <p className="text-gray-800 text-xl">
-                <span className="font-bold">Max: </span>
-                {weather.daily.data[0].all_day.temperature_max} °C
-              </p>
-              <p className="text-gray-800 text-xl">
-                <span className="font-bold">Min: </span>
-                {weather.daily.data[0].all_day.temperature_min} °C
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center bg-gray-100 rounded-lg p-4">
-            <Umbrella className="w-8 h-8 text-gray-800 mr-2" />
-            <p className="text-gray-800 text-xl">
-              <span className="font-bold">Neerslag: </span>
-              {weather.daily.data[0].all_day.precipitation.total} mm
-            </p>
-          </div>
-          <div className="flex items-center bg-gray-100 rounded-lg p-4">
-            <Wind className="w-8 h-8 text-gray-800 mr-2" />
-            <p className="text-gray-800 text-xl">
-              <span className="font-bold">Wind: </span>
-              {weather.daily.data[0].all_day.wind.speed} m/s (
-              {weather.daily.data[0].all_day.wind.dir})
-            </p>
-          </div>
-          <div className="flex items-center bg-gray-100 rounded-lg p-4">
-            <Thermometer className="w-8 h-8 text-gray-800 mr-2" />
-            <p className="text-gray-800 text-xl">
-              <span className="font-bold">Gem. temperatuur: </span>
-              {weather.daily.data[0].all_day.temperature} °C
             </p>
           </div>
         </div>
