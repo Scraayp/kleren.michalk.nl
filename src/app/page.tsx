@@ -54,7 +54,6 @@ type Weather = {
       }
     ];
   };
-  hourly: null | any;
 };
 
 const weatherIcons: { [key: string]: any } = {
@@ -64,10 +63,84 @@ const weatherIcons: { [key: string]: any } = {
   snowy: CloudSnow,
 };
 
+interface WeatherCardProps {
+  icon: React.ElementType; // Accepts a component type
+  label: string;
+  value: string;
+}
+
+const WeatherCard: React.FC<WeatherCardProps> = ({
+  icon: Icon,
+  label,
+  value,
+}) => (
+  <div className="flex items-center justify-center bg-gray-100 rounded-lg p-4">
+    <Icon className="w-8 h-8 text-gray-800 mr-2" />
+    <p className="text-gray-800 text-xl">
+      <span className="font-bold">{label}: </span>
+      {value}
+    </p>
+  </div>
+);
+
+const WeatherStats: React.FC<{ currentWeather: Weather["current"] }> = ({
+  currentWeather,
+}) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <WeatherCard
+      icon={Thermometer}
+      label="Temperatuur"
+      value={`${currentWeather.temperature} °C`}
+    />
+    <WeatherCard
+      icon={Droplet}
+      label="Kans op regen"
+      value={`${currentWeather.precipitation.total}% (${currentWeather.precipitation.type})`}
+    />
+    <WeatherCard
+      icon={Wind}
+      label="Wind"
+      value={`${currentWeather.wind.speed} m/s (${currentWeather.wind.dir})`}
+    />
+    <WeatherCard
+      icon={Cloud}
+      label="Bewolking"
+      value={`${currentWeather.cloud_cover}%`}
+    />
+  </div>
+);
+
+const DailyForecast: React.FC<{
+  dailyData: Weather["daily"]["data"][0]["all_day"];
+}> = ({ dailyData }) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <WeatherCard
+      icon={Thermometer}
+      label="Max / Min"
+      value={`${dailyData.temperature_max}/ ${dailyData.temperature_min} °C`}
+    />
+    <WeatherCard
+      icon={Umbrella}
+      label="Neerslag"
+      value={`${dailyData.precipitation.total} mm`}
+    />
+    <WeatherCard
+      icon={Wind}
+      label="Wind"
+      value={`${dailyData.wind.speed} m/s (${dailyData.wind.dir})`}
+    />
+    <WeatherCard
+      icon={Thermometer}
+      label="Gem. temperatuur"
+      value={`${dailyData.temperature} °C`}
+    />
+  </div>
+);
+
 export default function WeatherApp() {
   const [weather, setWeather] = useState<Weather | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [cityName, setCityName] = useState<string>("Amsterdam"); // Default to Amsterdam
+  const [cityName, setCityName] = useState<string>("Amsterdam");
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
 
@@ -93,7 +166,6 @@ export default function WeatherApp() {
 
   const getUserLocation = async () => {
     try {
-      // Using ip-api.com to get lat, lon, and city name from IP
       const response = await fetch("http://ip-api.com/json/");
       const data = await response.json();
       setCityName(data.city);
@@ -101,7 +173,6 @@ export default function WeatherApp() {
       setLongitude(data.lon);
     } catch (err) {
       setError("Failed to fetch location, defaulting to Amsterdam.");
-      // Default to Amsterdam if there's an error
       setCityName("Amsterdam");
       setLatitude(52.3676); // Amsterdam latitude
       setLongitude(4.9041); // Amsterdam longitude
@@ -169,6 +240,7 @@ export default function WeatherApp() {
   }
 
   const WeatherIcon = getWeatherIcon();
+  const dailyData = weather.daily.data[0].all_day;
 
   return (
     <main
@@ -189,78 +261,12 @@ export default function WeatherApp() {
         <h3 className="text-2xl font-bold text-gray-900 mb-4">
           Huidige weersituatie
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="flex items-center justify-center bg-gray-100 rounded-lg p-4">
-            <Thermometer className="w-8 h-8 text-gray-800 mr-2" />
-            <p className="text-gray-800 text-xl">
-              <span className="font-bold">Temperatuur: </span>
-              {weather.current.temperature} °C
-            </p>
-          </div>
-          <div className="flex items-center justify-center bg-gray-100 rounded-lg p-4">
-            <Droplet className="w-8 h-8 text-gray-800 mr-2" />
-            <p className="text-gray-800 text-xl">
-              <span className="font-bold">Kans op regen: </span>
-              {weather.current.precipitation.total}% (
-              {weather.current.precipitation.type})
-            </p>
-          </div>
-          <div className="flex items-center justify-center bg-gray-100 rounded-lg p-4">
-            <Wind className="w-8 h-8 text-gray-800 mr-2" />
-            <p className="text-gray-800 text-xl">
-              <span className="font-bold">Wind: </span>
-              {weather.current.wind.speed} m/s ({weather.current.wind.dir})
-            </p>
-          </div>
-          <div className="flex items-center justify-center bg-gray-100 rounded-lg p-4">
-            <Cloud className="w-8 h-8 text-gray-800 mr-2" />
-            <p className="text-gray-800 text-xl">
-              <span className="font-bold">Bewolking: </span>
-              {weather.current.cloud_cover}%
-            </p>
-          </div>
-        </div>
+        <WeatherStats currentWeather={weather.current} />
 
         <h3 className="text-2xl font-bold text-gray-900 mb-4">
           Dagelijkse voorspelling
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="flex items-center bg-gray-100 rounded-lg p-4">
-            <Thermometer className="w-8 h-8 text-gray-800 mr-2" />
-            <div>
-              <p className="text-gray-800 text-xl">
-                <span className="font-bold">Max: </span>
-                {weather.daily.data[0].all_day.temperature_max} °C
-              </p>
-              <p className="text-gray-800 text-xl">
-                <span className="font-bold">Min: </span>
-                {weather.daily.data[0].all_day.temperature_min} °C
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center bg-gray-100 rounded-lg p-4">
-            <Umbrella className="w-8 h-8 text-gray-800 mr-2" />
-            <p className="text-gray-800 text-xl">
-              <span className="font-bold">Neerslag: </span>
-              {weather.daily.data[0].all_day.precipitation.total} mm
-            </p>
-          </div>
-          <div className="flex items-center bg-gray-100 rounded-lg p-4">
-            <Wind className="w-8 h-8 text-gray-800 mr-2" />
-            <p className="text-gray-800 text-xl">
-              <span className="font-bold">Wind: </span>
-              {weather.daily.data[0].all_day.wind.speed} m/s (
-              {weather.daily.data[0].all_day.wind.dir})
-            </p>
-          </div>
-          <div className="flex items-center bg-gray-100 rounded-lg p-4">
-            <Thermometer className="w-8 h-8 text-gray-800 mr-2" />
-            <p className="text-gray-800 text-xl">
-              <span className="font-bold">Gem. temperatuur: </span>
-              {weather.daily.data[0].all_day.temperature} °C
-            </p>
-          </div>
-        </div>
+        <DailyForecast dailyData={dailyData} />
 
         <p className="text-gray-800 text-xl font-bold text-center mb-4 bg-gray-100 rounded-lg p-4">
           Weersomstandigheden:{" "}
